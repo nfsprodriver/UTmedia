@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=UTmedia
+Exec=webapp-container --inspector ./www/index.html
+Icon=UTmedia.png
+Terminal=false
+Type=Application
+X-Ubuntu-Touch=true

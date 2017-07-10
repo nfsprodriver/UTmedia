@@ -1,0 +1,16 @@
+{
+    "name": "utmedia.nfsprodriver",
+    "description": "An alternative media player for Ubuntu Touch",
+    "architecture": "all",
+    "title": "UTmedia",
+    "hooks": {
+        "UTmedia": {
+            "apparmor": "UTmedia.apparmor",
+            "desktop":  "UTmedia.desktop"
+        }
+    },
+    "version": "0.1",
+    "maintainer": "Bjarne Roß <ross.b@freenet.de>",
+    "framework" : "ubuntu-sdk-15.04.6"
+}
+
