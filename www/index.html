@@ -69,8 +69,10 @@
         }
     </style>
 	<script>
-		 function filesrc()
+                 function filesrc(mode)
 		 {
+                     if (mode == "file")
+                     {
 			document.getElementById("file_input").onchange = function ()
 			{
 				var file = document.getElementById('file_input').files[0];
@@ -92,6 +94,15 @@
 					document.getElementById("player2-container").style.display = "block ";
 				}
 			}
+                      }
+                      if (mode == "url")
+                      {
+                          var vid = document.getElementById('player1');
+                          var url = document.getElementById('url');
+                          vid.src = url.value;
+                          document.getElementById("player2-container").style.display = "none";
+                          document.getElementById("player1-container").style.display = "block ";
+                      }
 		 }
 	 </script>
 </head>
@@ -120,14 +131,19 @@
             </div>
         </div>
 	
-		<form id="frm" class="fileUpload button negative" data-role="button" style="font-size: 16px;">
-			<span>Select file</span>
-            <input id="file_input" type="file" onclick="filesrc()" class="upload">
+        <form id="frm" class="fileUpload button negative" data-role="button" style="font-size: 16px;">
+            <span>Select file</span>
+            <input id="file_input" type="file" onclick="filesrc('file')" class="upload">
         </form>
+        Stream URL: <input id="url" type="url" name="stream">
+        <form id="frm1" class="fileUpload button negative" data-role="button" style="font-size: 16px;">
+          <span>Submit URL</span>
+          <input id="stream" type="buttom" onclick="filesrc('url')" class="upload">
+       </form>
 		
 	<hr>
 	
-	<header id="current">Please select a media file using the button above!</header>
+        <header id="current">Please select a media file using the button above or enter a streaming url into the text field and submit it!</header>
 
 	
 

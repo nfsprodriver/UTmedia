@@ -9,7 +9,7 @@
             "desktop":  "UTmedia.desktop"
         }
     },
-    "version": "0.3",
+    "version": "0.10",
     "maintainer": "Bjarne Roß <ross.b@freenet.de>",
     "framework" : "ubuntu-sdk-15.04.6"
 }
