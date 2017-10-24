@@ -315,8 +315,8 @@ i18n.language = function () {
 			throw new TypeError('Language code must be a string value');
 		}
 
-		if (!/^(([a-z]{2}((\-|_)[a-z]{2})?)|([a-z]{3}))$/i.test(args[0])) {
-			throw new TypeError('Language code must have format `xx`, `xxx`, `xx_XX` or `xx-xx`');
+		if (!/^[a-z]{2,3}((\-|_)[a-z]{2})?$/i.test(args[0])) {
+			throw new TypeError('Language code must have format 2-3 letters and. optionally, hyphen, underscore followed by 2 more letters');
 		}
 
 		i18n.lang = args[0];
@@ -961,6 +961,15 @@ var MediaElement = function MediaElement(idOrNode, options, sources) {
 		}
 	};
 
+	t.mediaElement.destroy = function () {
+		var mediaElement = t.mediaElement.originalNode.cloneNode(true);
+		var wrapper = t.mediaElement.parentElement;
+		mediaElement.removeAttribute('id');
+		mediaElement.remove();
+		t.mediaElement.remove();
+		wrapper.append(mediaElement);
+	};
+
 	if (mediaFiles.length) {
 		t.mediaElement.src = mediaFiles;
 	}
@@ -1320,12 +1329,12 @@ var DashNativeRenderer = {
 		options = Object.assign(options, mediaElement.options);
 
 		var props = _mejs2.default.html5media.properties,
-		    events = _mejs2.default.html5media.events.concat(['click', 'mouseover', 'mouseout']),
+		    events = _mejs2.default.html5media.events.concat(['click', 'mouseover', 'mouseout']).filter(function (e) {
+			return e !== 'error';
+		}),
 		    attachNativeEvents = function attachNativeEvents(e) {
-			if (e.type !== 'error') {
-				var _event = (0, _general.createEvent)(e.type, mediaElement);
-				mediaElement.dispatchEvent(_event);
-			}
+			var event = (0, _general.createEvent)(e.type, mediaElement);
+			mediaElement.dispatchEvent(event);
 		},
 		    assignGettersSetters = function assignGettersSetters(propName) {
 			var capName = '' + propName.substring(0, 1).toUpperCase() + propName.substring(1);
@@ -1405,9 +1414,9 @@ var DashNativeRenderer = {
 					mediaElement.generateError(data.message, node.src);
 					console.error(data);
 				} else {
-					var _event2 = (0, _general.createEvent)(name, mediaElement);
-					_event2.data = data;
-					mediaElement.dispatchEvent(_event2);
+					var _event = (0, _general.createEvent)(name, mediaElement);
+					_event.data = data;
+					mediaElement.dispatchEvent(_event);
 				}
 			};
 
@@ -2010,12 +2019,12 @@ var FlvNativeRenderer = {
 		options = Object.assign(options, mediaElement.options);
 
 		var props = _mejs2.default.html5media.properties,
-		    events = _mejs2.default.html5media.events.concat(['click', 'mouseover', 'mouseout']),
+		    events = _mejs2.default.html5media.events.concat(['click', 'mouseover', 'mouseout']).filter(function (e) {
+			return e !== 'error';
+		}),
 		    attachNativeEvents = function attachNativeEvents(e) {
-			if (e.type !== 'error') {
-				var _event = (0, _general.createEvent)(e.type, mediaElement);
-				mediaElement.dispatchEvent(_event);
-			}
+			var event = (0, _general.createEvent)(e.type, mediaElement);
+			mediaElement.dispatchEvent(event);
 		},
 		    assignGettersSetters = function assignGettersSetters(propName) {
 			var capName = '' + propName.substring(0, 1).toUpperCase() + propName.substring(1);
@@ -2084,9 +2093,9 @@ var FlvNativeRenderer = {
 					var message = data[0] + ': ' + data[1] + ' ' + data[2].msg;
 					mediaElement.generateError(message, node.src);
 				} else {
-					var _event2 = (0, _general.createEvent)(name, mediaElement);
-					_event2.data = data;
-					mediaElement.dispatchEvent(_event2);
+					var _event = (0, _general.createEvent)(name, mediaElement);
+					_event.data = data;
+					mediaElement.dispatchEvent(_event);
 				}
 			};
 
@@ -2262,12 +2271,12 @@ var HlsNativeRenderer = {
 		options.hls.autoStartLoad = preload && preload !== 'none' || autoplay;
 
 		var props = _mejs2.default.html5media.properties,
-		    events = _mejs2.default.html5media.events.concat(['click', 'mouseover', 'mouseout']),
+		    events = _mejs2.default.html5media.events.concat(['click', 'mouseover', 'mouseout']).filter(function (e) {
+			return e !== 'error';
+		}),
 		    attachNativeEvents = function attachNativeEvents(e) {
-			if (e.type !== 'error') {
-				var _event = (0, _general.createEvent)(e.type, mediaElement);
-				mediaElement.dispatchEvent(_event);
-			}
+			var event = (0, _general.createEvent)(e.type, mediaElement);
+			mediaElement.dispatchEvent(event);
 		},
 		    assignGettersSetters = function assignGettersSetters(propName) {
 			var capName = '' + propName.substring(0, 1).toUpperCase() + propName.substring(1);
@@ -2348,15 +2357,19 @@ var HlsNativeRenderer = {
 								break;
 							case 'networkError':
 								if (data.details === 'manifestLoadError') {
-									if (index < total) {
+									if (index < total && mediaFiles[index + 1] !== undefined) {
 										node.setSrc(mediaFiles[index++].src);
 										node.load();
 										node.play();
+									} else {
+										var _message = 'Network error';
+										mediaElement.generateError(_message, mediaFiles);
+										console.error(_message);
 									}
 								} else {
-									var _message = 'Network error';
-									mediaElement.generateError(_message, mediaFiles);
-									console.error(_message);
+									var _message2 = 'Network error';
+									mediaElement.generateError(_message2, mediaFiles);
+									console.error(_message2);
 								}
 								break;
 							default:
@@ -2365,9 +2378,9 @@ var HlsNativeRenderer = {
 						}
 					}
 				} else {
-					var _event2 = (0, _general.createEvent)(name, mediaElement);
-					_event2.data = data;
-					mediaElement.dispatchEvent(_event2);
+					var _event = (0, _general.createEvent)(name, mediaElement);
+					_event.data = data;
+					mediaElement.dispatchEvent(_event);
 				}
 			};
 
@@ -2536,7 +2549,9 @@ var HtmlMediaElement = {
 			assignGettersSetters(props[i]);
 		}
 
-		var events = _mejs2.default.html5media.events.concat(['click', 'mouseover', 'mouseout']),
+		var events = _mejs2.default.html5media.events.concat(['click', 'mouseover', 'mouseout']).filter(function (e) {
+			return e !== 'error';
+		}),
 		    assignEvents = function assignEvents(eventName) {
 			node.addEventListener(eventName, function (e) {
 				if (isActive) {
@@ -2583,7 +2598,7 @@ var HtmlMediaElement = {
 
 		node.addEventListener('error', function (e) {
 			if (e.target.error.code === 4 && isActive) {
-				if (index < total) {
+				if (index < total && mediaFiles[index + 1] !== undefined) {
 					node.src = mediaFiles[index++].src;
 					node.load();
 					node.play();
@@ -2901,6 +2916,29 @@ var YouTubeIframeRenderer = {
 			assignMethods(methods[_i]);
 		}
 
+		var errorHandler = function errorHandler(error) {
+			var message = '';
+			switch (error.data) {
+				case 2:
+					message = 'The request contains an invalid parameter value. Verify that video ID has 11 characters and that contains no invalid characters, such as exclamation points or asterisks.';
+					break;
+				case 5:
+					message = 'The requested content cannot be played in an HTML5 player or another error related to the HTML5 player has occurred.';
+					break;
+				case 100:
+					message = 'The video requested was not found. Either video has been removed or has been marked as private.';
+					break;
+				case 101:
+				case 105:
+					message = 'The owner of the requested video does not allow it to be played in embedded players.';
+					break;
+				default:
+					message = 'Unknown error.';
+					break;
+			}
+			mediaElement.generateError('Code ' + error.data + ': ' + message, mediaFiles);
+		};
+
 		var youtubeContainer = _document2.default.createElement('div');
 		youtubeContainer.id = youtube.id;
 
@@ -3024,9 +3062,7 @@ var YouTubeIframeRenderer = {
 					}
 				},
 				onError: function onError(e) {
-					var event = (0, _general.createEvent)('error', youtube);
-					event.data = e.data;
-					mediaElement.dispatchEvent(event);
+					return errorHandler(e);
 				}
 			}
 		};
@@ -3444,7 +3480,10 @@ function siblings(el, filter) {
 }
 
 function visible(elem) {
-	return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+	if (elem.getClientRects !== undefined && elem.getClientRects === 'function') {
+		return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+	}
+	return !!(elem.offsetWidth || elem.offsetHeight);
 }
 
 function ajax(url, dataType, success, error) {
